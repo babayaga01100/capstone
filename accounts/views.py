@@ -14,18 +14,18 @@ from accounts.models import User
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup_view(request):
-    user_name = request.data['user_name']
-    user_id = request.data['user_id']
+    name = request.data['name']
+    username = request.data['username']
     phone_number = request.data['phone_number']
     password = request.data['password']
 
     # 아이디 중복 확인
-    if User.objects.filter(user_id=user_id).exists():
+    if User.objects.filter(username=username).exists():
         return Response({'message': '이미 가입된 아이디입니다.'}, status=405)
 
     user = User.objects.create_user(
-        user_name=user_name,
-        user_id=user_id,
+        name=name,
+        username=username,
         phone_number=phone_number,
         password=password
     )
@@ -39,10 +39,10 @@ def signup_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    user_id = request.data['user_id']
+    username = request.data['username']
     password = request.data['password']
 
-    user = authenticate(request, user_id=user_id, password=password)
+    user = authenticate(request, username=username, password=password)
 
     if user:
         token, _ = Token.objects.get_or_create(user=user)
@@ -62,33 +62,33 @@ def check_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def search_id_view(request):
-    user_name = request.data['user_name']
+    name = request.data['name']
     phone_number = request.data['phone_number']
 
-    if not User.objects.filter(user_name=user_name, phone_number=phone_number).exists():
+    if not User.objects.filter(name=name, phone_number=phone_number).exists():
         return Response({'message': '해당 사용자 정보가 없습니다.'}, status=404)
     
-    user = User.objects.get(user_name=user_name, phone_number=phone_number)
+    user = User.objects.get(name=name, phone_number=phone_number)
 
-    return Response({'user_id': user.user_id}, status=200)
+    return Response({'username': user.username}, status=200)
 
 
 # 비밀번호 찾기
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def search_password_view(request):
-    user_name = request.data['user_name']
-    user_id = request.data['user_id']
+    name = request.data['name']
+    username = request.data['username']
     phone_number = request.data['phone_number']
 
     if not User.objects.filter(
-        user_name=user_name,
-        user_id=user_id,
+        name=name,
+        username=username,
         phone_number=phone_number
     ).exists():
         return Response({'message': '해당 사용자 정보가 없습니다.'}, status=404)
     
-    user = User.objects.get(user_name=user_name, user_id=user_id, phone_number=phone_number)
+    user = User.objects.get(name=name, username=username, phone_number=phone_number)
     tmp_password = ''.join(random.sample(string.ascii_letters, 30))
     user.set_password(tmp_password)
     user.save()
@@ -101,7 +101,7 @@ def search_password_view(request):
 def verify_view(request):
     password = request.data['password']
 
-    user = authenticate(request, user_id=request.user, password=password)
+    user = authenticate(request, username=request.user, password=password)
 
     if user:
         return Response(status=200)
@@ -124,12 +124,12 @@ def modify_password_view(request):
 # 회원정보 수정
 @api_view(['PUT'])
 def modify_personal_information_view(request):
-    user_name = request.data['user_name']
+    name = request.data['name']
     phone_number = request.data['phone_number']
 
     user = User.objects.get(id=request.user.id)
 
-    user.user_name = user_name
+    user.name = name
     user.phone_number = phone_number
 
     user.save()
@@ -142,10 +142,11 @@ def modify_personal_information_view(request):
 def withdraw_view(request):
     password = request.data['password']
 
-    user = authenticate(request, user_id=request.user, password=password)
+    user = authenticate(request, username=request.user, password=password)
 
     if user:
         user.delete()
         return Response(status=200)
     else:
         return Response({'message': '비밀번호를 잘못 입력했습니다.'}, status=400)
+    

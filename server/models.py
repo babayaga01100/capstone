@@ -1,8 +1,14 @@
 from django.db import models
+from accounts.models import User
+
+class SmartFarm(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sfid = models.IntegerField()
 
 # Create your models here.
 class SmartFarmSensor(models.Model):
-    sfid = models.IntegerField(default= 92)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # sfid = models.ForeignKey(SmartFarm, on_delete=models.CASCADE, db_column="sfid")
     remotepower = models.BooleanField()
     temperature = models.FloatField()
     humidity = models.FloatField()

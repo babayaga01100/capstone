@@ -9,9 +9,9 @@ urlpatterns = [
     path('login', login_view, name='login'),
     path('check', check_view, name='check'),
     path('verify', verify_view, name='verify'),
-    path('search_id', search_id_view, name='search-id'),
-    path('search_password', search_password_view, name='search-password'),
-    path('modify_password', modify_password_view, name='modify-password'),
-    path('modify_personal-information', modify_personal_information_view, name='modify-personal-information'),
+    path('search/id', search_id_view, name='search-id'),
+    path('search/password', search_password_view, name='search-password'),
+    path('modify/password', modify_password_view, name='modify-password'),
+    path('modify/personal-information', modify_personal_information_view, name='modify-personal-information'),
     path('withdraw', withdraw_view, name='withdraw')
 ]
