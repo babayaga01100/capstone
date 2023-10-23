@@ -29,7 +29,7 @@ class LedListModelSerializer(SmartFarmBaseModelSerializer):
         
 class WaterListModelSerializer(SmartFarmBaseModelSerializer):
     class Meta(SmartFarmBaseModelSerializer.Meta):
-        filed = ['waterpumppower',
+        fields = ['waterpumppower',
                 'waterpumpstate',
                 'waterpumptoggle',
                 'waterpumpautotoggle',
@@ -39,7 +39,7 @@ class WaterListModelSerializer(SmartFarmBaseModelSerializer):
                 'watertemperature']
 class FanListModelSerializer(SmartFarmBaseModelSerializer):
     class Meta(SmartFarmBaseModelSerializer.Meta):
-        field = [
+        fields = [
             'fanpower',
             'fanstate',
             'fantoggle',
@@ -52,7 +52,7 @@ class FanListModelSerializer(SmartFarmBaseModelSerializer):
         
 class DoorListModelSerializer(SmartFarmBaseModelSerializer):
     class Meta(SmartFarmBaseModelSerializer.Meta):
-        field = [
+        fields = [
                 'doorpower',
                 'doorstate',
                 'doortoggle',
@@ -65,7 +65,7 @@ class DoorListModelSerializer(SmartFarmBaseModelSerializer):
         
 class WarningListModelSerializer(SmartFarmBaseModelSerializer):
     class Meta(SmartFarmBaseModelSerializer.Meta):
-        field = [
+        fields = [
                 'waterlevelwarning',
                 'watertempwarning',
                 'tempwarning',
