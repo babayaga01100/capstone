@@ -122,7 +122,7 @@ def remove_smartfarm_view(request):
 # Create your views here.
 class RaspberryView(APIView):
     # queryset = SmartFarmSensor.objects.all()
-    serializer_class = SmartFarmBaseModelSerializer
+    # serializer_class = SmartFarmBaseModelSerializer
     
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
@@ -193,13 +193,11 @@ class RaspberryView(APIView):
         
         try:
             smartfarm = SmartFarm.objects.get(user=request.user)
-            sensor = SmartFarmSensor.objects.get(smartfarm=smartfarm)
-            sensor.save()
-        
         except SmartFarmSensor.DoesNotExist:
             return Response({'message': '등록한 스마트팜이 없습니다.'}, status=404)
         
         SmartFarmSensor(
+            smartfarm=smartfarm,
             remotepower = remotepower,
             temperature = temperature,
             humidity = humidity,
