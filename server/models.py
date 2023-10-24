@@ -51,11 +51,8 @@ class SmartFarmSensor(models.Model):
     doorendtimevalue = models.IntegerField()
     doorendminutevalue = models.IntegerField()
     
-    waterlevelwarning = models.TextField()
-    watertempwarning = models.TextField()
-    tempwarning = models.TextField()
-    humwarning = models.TextField()
-    soilwarning = models.TextField()
-    
-# class SmartFarm(models.Model):
-#     sfid = models.ForeignKey()
+    waterlevelwarning = models.TextField(auto_created=True, null=True)
+    watertempwarning = models.TextField(auto_created=True, null=True)
+    tempwarning = models.TextField(auto_created=True, null=True)
+    humwarning = models.TextField(auto_created=True, null=True)
+    soilwarning = models.TextField(auto_created=True, null=True)

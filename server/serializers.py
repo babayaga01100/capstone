@@ -1,12 +1,18 @@
 from rest_framework.serializers import ModelSerializer
 
-from .models import SmartFarmSensor
+from .models import SmartFarm, SmartFarmSensor
 
 class SmartFarmBaseModelSerializer(ModelSerializer):
     class Meta:
         model = SmartFarmSensor
         fields = '__all__'
         # exclude = ("")
+        
+class SFSerializer(ModelSerializer):
+
+    class Meta:
+        model = SmartFarm
+        fields = '__all__'
     
 class InfoListModelSerializer(SmartFarmBaseModelSerializer):
     class Meta(SmartFarmBaseModelSerializer.Meta):
@@ -72,3 +78,4 @@ class WarningListModelSerializer(SmartFarmBaseModelSerializer):
                 'humwarning',
                 'soilwarning'
         ]
+        

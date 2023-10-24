@@ -18,6 +18,7 @@ def signup_view(request):
     username = request.data['username']
     phone_number = request.data['phone_number']
     password = request.data['password']
+    fcmToken = request.data['fcm_token']
 
     # 아이디 중복 확인
     if User.objects.filter(username=username).exists():
@@ -27,7 +28,8 @@ def signup_view(request):
         name=name,
         username=username,
         phone_number=phone_number,
-        password=password
+        password=password,
+        fcmToken=fcmToken
     )
 
     user.save()

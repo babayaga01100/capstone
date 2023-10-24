@@ -1,4 +1,5 @@
 from django.urls import path
+# from django.contrib import admin
 
 from accounts.views import signup_view, login_view, check_view, search_id_view, search_password_view, verify_view, modify_password_view, modify_personal_information_view, withdraw_view
 

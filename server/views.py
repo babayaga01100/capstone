@@ -7,7 +7,8 @@ from rest_framework import status
 from django.db.models import Max
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -16,11 +17,111 @@ from rest_framework.views import APIView
 
 from django.shortcuts import render
 
-# from ..fcm_notification import send_push_notification
+from rest_framework.authtoken.models import Token
 
-from .models import SmartFarmSensor
-from .serializers import DoorListModelSerializer, FanListModelSerializer, InfoListModelSerializer, LedListModelSerializer, SmartFarmBaseModelSerializer, WarningListModelSerializer, WaterListModelSerializer
+# from ..fcm_notification import send_push_notification, send_push_notification2, send_push_notification3, send_push_notification4, send_push_notification5
 
+from .models import SmartFarmSensor, SmartFarm, User
+from .serializers import DoorListModelSerializer, FanListModelSerializer, InfoListModelSerializer, LedListModelSerializer, SFSerializer, SmartFarmBaseModelSerializer, WarningListModelSerializer, WaterListModelSerializer
+
+# 스마트팜 고유번호 확인
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_smartfarm_id_view(request):
+    try:
+        sfid = request.data['sfid']
+        SmartFarm.objects.get(sfid=sfid)
+        
+        return Response({'message': '이미 등록되어 있는 스마트팜입니다.'}, status=400)
+    except:
+        return Response(status=200)    
+
+
+# 스마트팜 등록      
+@api_view(['POST'])
+def register_smartfarm_view(request):
+    # 사용자 가져오기
+    try:
+        user = User.objects.get(username=request.user)
+    except:
+        return Response({'message': '등록되어 있지 않은 사용자입니다.'}, status=404)
+    
+    # 스마트팜 등록하기
+    sfid = request.data['sfid']
+    smartfarm = SmartFarm.objects.create(user=user, sfid=sfid)
+    smartfarm.save()
+    
+    return Response(status=200)
+
+
+# 스마트팜 수정
+@api_view(['POST'])
+def modify_smartfarm_view(request):
+    # 사용자 가져오기
+    try:
+        user = User.objects.get(username=request.user)
+    except:
+        return Response({'message': '등록되어 있지 않은 사용자입니다.'}, status=404)
+    
+    # 스마트팜 가져오기
+    try:
+        smartfarm = SmartFarm.objects.get(user=user)
+        
+        sfid = request.data['sfid']
+        smartfarm.sfid = sfid
+        smartfarm.save()
+    except:
+        return Response({'message': '등록되어 있는 스마트팜이 없습니다.'}, status=400)
+    
+    # 스마트팜 등록하기
+    sfid = request.data['sfid']
+    smartfarm = SmartFarm.objects.create(user=user, sfid=sfid)
+    smartfarm.save()
+
+
+# 스마트팜 삭제    
+@api_view(['DELETE'])
+def remove_smartfarm_view(request):
+    try:
+        sfid = request.data['sfid']
+        smartfarm = SmartFarm.objects.get(sfid=sfid)
+        smartfarm.delete()
+        
+        return Response(status=200)
+    except:
+        return Response({'message': '등록되어 있지 않은 스마트팜입니다.'}, status=404)
+    
+
+# class RegistrationSF(APIView):
+
+#     def post(self, request):
+#         # 사용자 가져오기
+#         try:
+#             user = User.objects.get(username=request.user)
+#         except User.DoesNotExist:
+#             return Response({'message': '등록되어 있지 않은 사용자입니다.'}, status=404)
+        
+#         # 스마트팜 등록하기
+#         # 토큰 검증
+#         # token = request.data.get('token')
+#         # try:
+#         #     user = User.objects.get(username=request.user)
+#             # token_obj = Token.objects.get(key=token)
+#             # user = token_obj.user  # 토큰에서 사용자 추출
+#         # except Token.DoesNotExist:
+#         #     return Response({'message': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+#         # 토큰이 유효하고 사용자가 인증되면 나머지 작업 수행
+#         serializer = SFSerializer(data=request.data)
+#         # print(serializer.data)
+#         if serializer.is_valid():
+#             user = User.objects.get(username=request.user)
+#             # SmartFarm 모델의 user 필드에 사용자 연결
+#             serializer.validated_data['username'] = user
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 # Create your views here.
 class RaspberryView(APIView):
     # queryset = SmartFarmSensor.objects.all()
@@ -150,17 +251,17 @@ class RaspberryView(APIView):
         # if waterlevelwarning != '':
         #     send_push_notification()
         # elif watertempwarning != '':
-        #     send_push_notification()
+        #     send_push_notification2()
         # elif tempwarning != '':
-        #     send_push_notification()
+        #     send_push_notification3()
         # elif humwarning != '':
-        #     send_push_notification()
+        #     send_push_notification4()
         # elif soilwarning != '':
-        #     send_push_notification()
+        #     send_push_notification5()
         # else:
         #     Response({'No':'Message'})
             
-        return Response({'su':'ccess_Rasp'})
+        return Response({'su':'ccess_fcm'})
 
           
 class InfoView(generics.ListAPIView):
@@ -303,7 +404,7 @@ class DoorView(generics.ListAPIView):
             queryset = SmartFarmSensor.objects.filter(id=latest_id)
             return queryset
         except SmartFarmSensor.DoesNotExist:
-            return Response({'message': 'LED Error.'}, status=404)
+            return Response({'message': 'Door Error.'}, status=404)
     
 class WarningView(generics.ListAPIView):
     # queryset = SmartFarmSensor.objects.all()
@@ -317,9 +418,25 @@ class WarningView(generics.ListAPIView):
         soilwarning = request.data['soilwarning']
         
         latest_id = SmartFarmSensor.objects.latest('id').id
-        SmartFarmSensor.objects.filter(id=latest_id).update(waterlevelwarning=waterlevelwarning, watertempwarning=watertempwarning, 
-                                        tempwarning=tempwarning, humwarning=humwarning, 
-                                        soilwarning=soilwarning)
+        
+        if waterlevelwarning != '':
+            waterlevelwarning == ''
+            SmartFarmSensor.objects.filter(id=latest_id).update(waterlevelwarning=waterlevelwarning)
+        elif watertempwarning != '':
+            watertempwarning == ''
+            SmartFarmSensor.objects.filter(id=latest_id).update(watertempwarning=watertempwarning)
+        elif tempwarning != '':
+            tempwarning == ''
+            SmartFarmSensor.objects.filter(id=latest_id).update(tempwarning=tempwarning)
+        elif humwarning != '':
+            humwarning == ''
+            SmartFarmSensor.objects.filter(id=latest_id).update(humwarning=humwarning)
+        elif soilwarning != '':
+            soilwarning == ''
+            SmartFarmSensor.objects.filter(id=latest_id).update(soilwarning=soilwarning)
+        else:
+            Response({'No':'Message'})
+            
         return Response({'su':'ccess_warning'})
         
     def get_queryset(self):
@@ -329,9 +446,8 @@ class WarningView(generics.ListAPIView):
             queryset = SmartFarmSensor.objects.filter(id=latest_id)
             return queryset
         except SmartFarmSensor.DoesNotExist:
-            return Response({'message': 'LED Error.'}, status=404)
-    
-    
+            return Response({'message': 'Warning Error.'}, status=404)
+        
     
         # soil = request.get(soil=soil)
     

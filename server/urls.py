@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import DoorView, FanView, InfoView, LedView, RaspberryView, WarningView, WaterView
+from .views import DoorView, FanView, InfoView, LedView, RaspberryView, RegistrationSF, WarningView, WaterView
+from .views import register_smartfarm_view
 
 app_name = 'server'
 
@@ -13,7 +14,6 @@ urlpatterns = [
     path('fan', FanView.as_view()),
     path('door', DoorView.as_view()),
     path('warning', WarningView.as_view()),
-    
-    
+    path("register/smartfarm", register_smartfarm_view, name="register-smartfarm")
 ]
 

@@ -65,18 +65,72 @@ firebase_admin.initialize_app(path)
 def send_push_notification(registration_token, message):
     registration_token = ''
 
-    
     message = messaging.Message(
         notification = messaging.Notification(
-            data = '내부 습도 경고!',
+            data = '물 높이 경고!',
             body = '스마트팜을 확인해주세요!'
-        ),
-            
+        ),    
         token = registration_token,
     )
 
     response = messaging.send(message)
-    print('successfully sent message: ', response)
+    print('successfully waterlevel message: ', response)
+    
+def send_push_notification2(registration_token, message):
+    registration_token = ''
 
+    message = messaging.Message(
+        notification = messaging.Notification(
+            data = '물 온도 경고!',
+            body = '스마트팜을 확인해주세요!'
+        ),    
+        token = registration_token,
+    )
+
+    response = messaging.send(message)
+    print('successfully watertemp message: ', response)
+
+def send_push_notification3(registration_token, message):
+    registration_token = ''
+
+    message = messaging.Message(
+        notification = messaging.Notification(
+            data = '내부 온도 경고!',
+            body = '스마트팜을 확인해주세요!'
+        ),    
+        token = registration_token,
+    )
+
+    response = messaging.send(message)
+    print('successfully temp message: ', response)
+    
+def send_push_notification4(registration_token, message):
+    registration_token = ''
+
+    message = messaging.Message(
+        notification = messaging.Notification(
+            data = '습도 경고!',
+            body = '스마트팜을 확인해주세요!'
+        ),    
+        token = registration_token,
+    )
+
+    response = messaging.send(message)
+    print('successfully hum message: ', response)
+    
+def send_push_notification5(registration_token, message):
+    registration_token = ''
+
+    message = messaging.Message(
+        notification = messaging.Notification(
+            data = '수분 경고!',
+            body = '스마트팜을 확인해주세요!'
+        ),    
+        token = registration_token,
+    )
+
+    response = messaging.send(message)
+    print('successfully soil message: ', response)
+    
 # if __name__ == "__main__":
 #     send_push_notification()
