@@ -7,12 +7,6 @@ class SmartFarmBaseModelSerializer(ModelSerializer):
         model = SmartFarmSensor
         fields = '__all__'
         # exclude = ("")
-        
-class SFSerializer(ModelSerializer):
-
-    class Meta:
-        model = SmartFarm
-        fields = '__all__'
     
 class InfoListModelSerializer(SmartFarmBaseModelSerializer):
     class Meta(SmartFarmBaseModelSerializer.Meta):

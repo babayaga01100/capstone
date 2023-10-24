@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import DoorView, FanView, InfoView, LedView, RaspberryView, RegistrationSF, WarningView, WaterView
+from .views import DoorView, FanView, InfoView, LedView, RaspberryView, WarningView, WaterView
 from .views import register_smartfarm_view
 
 app_name = 'server'

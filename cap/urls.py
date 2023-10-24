@@ -44,6 +44,7 @@ urlpatterns = [
     
     path('farm/', include('server.urls', namespace='server')),
     
-    path('accounts/', include('accounts.urls', namespace='accounts'))
+    path('accounts/', include('accounts.urls', namespace='accounts')),
 
+    path('crop/', include('crops.urls', namespace='crops'))
 ]

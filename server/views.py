@@ -1,28 +1,27 @@
 import json
 from requests import request
-from rest_framework import authentication, permissions
+# from rest_framework import authentication, permissions
 from rest_framework import generics
 from rest_framework import status
 
-from django.db.models import Max
+# from django.db.models import Max
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+# from rest_framework.authentication import TokenAuthentication
+# from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.views import APIView
 
 from django.shortcuts import render
 
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 
 # from ..fcm_notification import send_push_notification, send_push_notification2, send_push_notification3, send_push_notification4, send_push_notification5
 
 from .models import SmartFarmSensor, SmartFarm, User
-from .serializers import DoorListModelSerializer, FanListModelSerializer, InfoListModelSerializer, LedListModelSerializer, SFSerializer, SmartFarmBaseModelSerializer, WarningListModelSerializer, WaterListModelSerializer
+from .serializers import DoorListModelSerializer, FanListModelSerializer, InfoListModelSerializer, LedListModelSerializer, SmartFarmBaseModelSerializer, WarningListModelSerializer, WaterListModelSerializer
 
 # 스마트팜 고유번호 확인
 @api_view(['POST'])
@@ -33,7 +32,7 @@ def check_smartfarm_id_view(request):
         SmartFarm.objects.get(sfid=sfid)
         
         return Response({'message': '이미 등록되어 있는 스마트팜입니다.'}, status=400)
-    except:
+    except SmartFarm.DoesNotExist:
         return Response(status=200)    
 
 
@@ -43,52 +42,50 @@ def register_smartfarm_view(request):
     # 사용자 가져오기
     try:
         user = User.objects.get(username=request.user)
-    except:
+    except User.DoesNotExist:
         return Response({'message': '등록되어 있지 않은 사용자입니다.'}, status=404)
     
     # 스마트팜 등록하기
     sfid = request.data['sfid']
     smartfarm = SmartFarm.objects.create(user=user, sfid=sfid)
     smartfarm.save()
+    
+    # 스마트팜 센서 등록하기
+    smartfarmSensor = SmartFarmSensor.objects.create(smartfarm=smartfarm)
+    smartfarmSensor.save()
     
     return Response(status=200)
 
 
 # 스마트팜 수정
-@api_view(['POST'])
+@api_view(['PUT'])
 def modify_smartfarm_view(request):
-    # 사용자 가져오기
+    # 스마트팜 가져오기 및 수정하기
     try:
-        user = User.objects.get(username=request.user)
-    except:
-        return Response({'message': '등록되어 있지 않은 사용자입니다.'}, status=404)
-    
-    # 스마트팜 가져오기
-    try:
-        smartfarm = SmartFarm.objects.get(user=user)
-        
+        id = request.data['id']
         sfid = request.data['sfid']
+        
+        smartfarm = SmartFarm.objects.get(id=id)
+        
         smartfarm.sfid = sfid
         smartfarm.save()
-    except:
+        
+        return Response(status=200)
+        
+    except SmartFarm.DoesNotExist:
         return Response({'message': '등록되어 있는 스마트팜이 없습니다.'}, status=400)
     
-    # 스마트팜 등록하기
-    sfid = request.data['sfid']
-    smartfarm = SmartFarm.objects.create(user=user, sfid=sfid)
-    smartfarm.save()
-
 
 # 스마트팜 삭제    
 @api_view(['DELETE'])
 def remove_smartfarm_view(request):
     try:
-        sfid = request.data['sfid']
-        smartfarm = SmartFarm.objects.get(sfid=sfid)
+        id = request.data['id']
+        smartfarm = SmartFarm.objects.get(id=id)
         smartfarm.delete()
         
         return Response(status=200)
-    except:
+    except SmartFarm.DoesNotExist:
         return Response({'message': '등록되어 있지 않은 스마트팜입니다.'}, status=404)
     
 
@@ -144,7 +141,7 @@ class RaspberryView(APIView):
         
 
     def post(self, request):
-        user = request.user
+        # user = request.user
         # sfid = request.data['sfid']
         remotepower = request.data['remotepower']
         temperature = request.data['temperature']
@@ -195,14 +192,14 @@ class RaspberryView(APIView):
         soilwarning = request.data['soilwarning']
         
         try:
-            smartfarm = SmartFarmSensor.objects.filter(user_id=request.user)
+            smartfarm = SmartFarm.objects.get(user=request.user)
+            sensor = SmartFarmSensor.objects.get(smartfarm=smartfarm)
+            sensor.save()
+        
         except SmartFarmSensor.DoesNotExist:
             return Response({'message': '등록한 스마트팜이 없습니다.'}, status=404)
         
-        
         SmartFarmSensor(
-            user = user,
-            # sfid = sfid,
             remotepower = remotepower,
             temperature = temperature,
             humidity = humidity,
@@ -247,7 +244,6 @@ class RaspberryView(APIView):
             soilwarning = soilwarning,
         ).save()
         
-        
         # if waterlevelwarning != '':
         #     send_push_notification()
         # elif watertempwarning != '':
@@ -261,7 +257,7 @@ class RaspberryView(APIView):
         # else:
         #     Response({'No':'Message'})
             
-        return Response({'su':'ccess_fcm'})
+        return Response({'su':'ccess_rsp'})
 
           
 class InfoView(generics.ListAPIView):
@@ -492,3 +488,4 @@ class WarningView(generics.ListAPIView):
         # tempwarning = request.get(tempwarning=tempwarning)
         # humwarning = request.get(humwarning=humwarning)
         # soilwarning = request.get(soilwarning=soilwarning)
+        
