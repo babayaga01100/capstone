@@ -5,7 +5,51 @@ from .models import SmartFarm, SmartFarmSensor
 class SmartFarmBaseModelSerializer(ModelSerializer):
     class Meta:
         model = SmartFarmSensor
-        fields = '__all__'
+        # fields = '__all__'
+        fields = [ 
+                  'remotepower', 
+                  'temperature', 
+                  'humidity',
+                  'light',
+                  'soil',
+                  'ledpower', 
+                  'ledstate', 
+                  'ledtoggle', 
+                  'ledautotoggle', 
+                  'ledstarttimevalue', 
+                  'ledstartminutevalue', 
+                  'ledendtimevalue', 
+                  'ledendminutevalue',
+                  'waterpumppower',
+                  'waterpumpstate',
+                  'waterpumptoggle',
+                  'waterpumpautotoggle',
+                  'waterpumpstarttime',
+                  'waterpumprunningtime',
+                  'waterlevelvoltage',
+                  'watertemperature',
+                  'fanpower',
+                  'fanstate',
+                  'fantoggle',
+                  'fanautotoggle',
+                  'fanstarttimevalue',
+                  'fanstartminutevalue',
+                  'fanendtimevalue',
+                  'fanendminutevalue',
+                  'doorpower',
+                  'doorstate',
+                  'doortoggle',
+                  'doorautotoggle',
+                  'doorstarttimevalue',
+                  'doorstartminutevalue',
+                  'doorendtimevalue',
+                  'doorendminutevalue',
+                  'waterlevelwarning',
+                  'watertempwarning',
+                  'tempwarning',
+                  'humwarning',
+                  'soilwarning'
+        ]
         # exclude = ("")
     
 class InfoListModelSerializer(SmartFarmBaseModelSerializer):

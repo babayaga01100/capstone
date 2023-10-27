@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'rest_framework.authtoken',
+    "fcm_django",
     'server',
     'accounts',
     'crops',
+    'fcm_notification',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +94,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'crops')
+MEDIA_URL = '/media/'
 
 
 # Password validation

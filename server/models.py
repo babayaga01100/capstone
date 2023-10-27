@@ -4,7 +4,7 @@ from crops.models import SmartFarmCrop
 
 class SmartFarm(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    sfid = models.IntegerField()
+    sfid = models.CharField(max_length=10)
     crop = models.ForeignKey(SmartFarmCrop, on_delete=models.CASCADE, null=True)
 
 # Create your models here.

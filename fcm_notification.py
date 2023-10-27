@@ -54,83 +54,263 @@
 
 # This registration token comes from the client FCM SDKs.
 
+
+# from .accounts.models import User
+# import firebase_admin
+# from firebase_admin import credentials
+# from firebase_admin import messaging
+# from rest_framework.response import Response
+
+# json_path = "/home/dfx/naro/cap/smartfarmKey.json"
+# path = credentials.Certificate(json_path)
+# firebase_admin.initialize_app(path)
+
+# def send_push_notification(registration_token, message):
+#     try:
+#         user = User.objects.get(username='fcm_token')
+#         user.fcm_token = registration_token
+
+#         message = messaging.Message(
+#             notification = messaging.Notification(
+#                 data = '물 높이 경고!',
+#                 body = '스마트팜을 확인해주세요!'
+#             ),    
+#             token = registration_token,
+#         )
+
+#         response = messaging.send(message)
+#         print('successfully waterlevel message: ', response)
+#     except User.DoesNotExist:
+#         return Response({'message': '사용자 프로필이 없습니다.'}, status=404)
+    
+# def send_push_notification2(registration_token, message):
+#     try:
+#         user = User.objects.get(username='fcm_token')
+#         user.fcm_token = registration_token
+
+
+#         message = messaging.Message(
+#             notification = messaging.Notification(
+#                 data = '물 온도 경고!',
+#                 body = '스마트팜을 확인해주세요!'
+#             ),    
+#             token = registration_token,
+#         )
+
+#         response = messaging.send(message)
+#         print('successfully watertemp message: ', response)
+        
+#     except User.DoesNotExist:
+#         return Response({'message': '사용자 프로필이 없습니다.'}, status=404)
+    
+# def send_push_notification3(registration_token, message):
+#     try:
+#         user = User.objects.get(username='fcm_token')
+#         user.fcm_token = registration_token
+
+
+#         message = messaging.Message(
+#             notification = messaging.Notification(
+#                 data = '내부 온도 경고!',
+#                 body = '스마트팜을 확인해주세요!'
+#             ),    
+#             token = registration_token,
+#         )
+
+#         response = messaging.send(message)
+#         print('successfully temp message: ', response)
+        
+#     except User.DoesNotExist:
+#         return Response({'message': '사용자 프로필이 없습니다.'}, status=404)
+    
+# def send_push_notification4(registration_token, message):
+#     try:
+#         user = User.objects.get(username='fcm_token')
+#         user.fcm_token = registration_token
+
+
+#         message = messaging.Message(
+#             notification = messaging.Notification(
+#                 data = '습도 경고!',
+#                 body = '스마트팜을 확인해주세요!'
+#             ),    
+#             token = registration_token,
+#         )
+
+#         response = messaging.send(message)
+#         print('successfully hum message: ', response)
+        
+#     except User.DoesNotExist:
+#         return Response({'message': '사용자 프로필이 없습니다.'}, status=404)
+    
+# def send_push_notification5(registration_token, message):
+#     try:
+#         user = User.objects.get(username='fcm_token')
+#         user.fcm_token = registration_token
+
+
+#         message = messaging.Message(
+#             notification = messaging.Notification(
+#                 data = '수분 경고!',
+#                 body = '스마트팜을 확인해주세요!'
+#             ),    
+#             token = registration_token,
+#         )
+
+#         response = messaging.send(message)
+#         print('successfully soil message: ', response)
+        
+#     except User.DoesNotExist:
+#         return Response({'message': '사용자 프로필이 없습니다.'}, status=404)
+    
+
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, initialize_app
 from firebase_admin import messaging
+from rest_framework.response import Response
 
-json_path = "/home/dfx/naro/cap/smartfarmKey.json"
-path = credentials.Certificate(json_path)
-firebase_admin.initialize_app(path)
+# json_path = "/home/dfx/naro/cap/smartfarmKey.json"
+# path = credentials.Certificate(json_path)
+# # firebase_admin.initialize_app(path)
+# initialize_app(path, name='smartfarm')
 
-def send_push_notification(registration_token, message):
-    registration_token = ''
+def send_push_notification(request, waterlevelwarning):
+    user = User.objects.get(username=request.user)
 
-    message = messaging.Message(
-        notification = messaging.Notification(
-            data = '물 높이 경고!',
-            body = '스마트팜을 확인해주세요!'
-        ),    
+    # fcm_token 가져오기
+    registration_token = user.fcm_token
+
+    if waterlevelwarning != "":
+        print("waterlevelwarning 메세지가 있습니다.")
+        
+        message = messaging.Message(
+        notification=messaging.Notification(
+                title = '물 높이 경고!',
+                body = '스마트팜을 확인해주세요!'
+            ),
         token = registration_token,
-    )
+        )
+        
+        try:
+            response = messaging.send(message)
+            # 전송 결과 출력
+            print('Successfully sent message:', response)
+            return Response({'message': 'waterlevelwarning FCM 메시지가 성공적으로 전송되었습니다.'}, status=200)
+        except Exception as e:
+            return Response({'message': 'waterlevelwarning FCM 메시지 전송 중 오류가 발생했습니다.'}, status=500)
+    return Response({'message' : 'waterlevelwarning 경고 메시지가 없습니다.'}, status=200)
+        
+def send_push_notification2(request, watertempwarning):
+    user = User.objects.get(username=request.user)
 
-    response = messaging.send(message)
-    print('successfully waterlevel message: ', response)
+    # fcm_token 가져오기
+    registration_token = user.fcm_token
+
+    if watertempwarning != "":
+        print("watertempwarning 메세지가 있습니다.")
+        
+        message = messaging.Message(
+        notification=messaging.Notification(
+                title = '물 온도 경고!',
+                body = '스마트팜을 확인해주세요!'
+            ),
+        token = registration_token,
+        )
+        
+        try:
+            response = messaging.send(message)
+            # 전송 결과 출력
+            print('Successfully sent message:', response)
+            return Response({'message': 'watertempwarning FCM 메시지가 성공적으로 전송되었습니다.'}, status=200)
+        except Exception as e:
+            return Response({'message': 'watertempwarning FCM 메시지 전송 중 오류가 발생했습니다.'}, status=500)
+    return Response({'message' : 'watertempwarning 경고 메시지가 없습니다.'}, status=200)
     
-def send_push_notification2(registration_token, message):
-    registration_token = ''
+def send_push_notification3(request, tempwarning):
+    user = User.objects.get(username=request.user)
 
-    message = messaging.Message(
-        notification = messaging.Notification(
-            data = '물 온도 경고!',
-            body = '스마트팜을 확인해주세요!'
-        ),    
+    # fcm_token 가져오기
+    registration_token = user.fcm_token
+
+    if tempwarning != "":
+        print("tempwarning 메세지가 있습니다.")
+        
+        message = messaging.Message(
+        notification=messaging.Notification(
+                title = '내부 온도 경고!',
+                body = '스마트팜을 확인해주세요!'
+            ),
         token = registration_token,
-    )
-
-    response = messaging.send(message)
-    print('successfully watertemp message: ', response)
-
-def send_push_notification3(registration_token, message):
-    registration_token = ''
-
-    message = messaging.Message(
-        notification = messaging.Notification(
-            data = '내부 온도 경고!',
-            body = '스마트팜을 확인해주세요!'
-        ),    
-        token = registration_token,
-    )
-
-    response = messaging.send(message)
-    print('successfully temp message: ', response)
+        )
+        
+        try:
+            response = messaging.send(message)
+            # 전송 결과 출력
+            print('Successfully sent message:', response)
+            return Response({'message': 'tempwarning FCM 메시지가 성공적으로 전송되었습니다.'}, status=200)
+        except Exception as e:
+            return Response({'message': 'tempwarning FCM 메시지 전송 중 오류가 발생했습니다.'}, status=500)
+    return Response({'message' : 'tempwarning 경고 메시지가 없습니다.'}, status=200)
     
-def send_push_notification4(registration_token, message):
-    registration_token = ''
+def send_push_notification4(request, humwarning):
+    user = User.objects.get(username=request.user)
 
-    message = messaging.Message(
-        notification = messaging.Notification(
-            data = '습도 경고!',
-            body = '스마트팜을 확인해주세요!'
-        ),    
+    # fcm_token 가져오기
+    registration_token = user.fcm_token
+
+    if humwarning != "":
+        print("humwarning 메세지가 있습니다.")
+        
+        message = messaging.Message(
+        notification=messaging.Notification(
+                title = '습도 경고!',
+                body = '스마트팜을 확인해주세요!'
+            ),
         token = registration_token,
-    )
-
-    response = messaging.send(message)
-    print('successfully hum message: ', response)
+        )
+        
+        try:
+            response = messaging.send(message)
+            # 전송 결과 출력
+            print('Successfully sent message:', response)
+            return Response({'message': 'humwarning FCM 메시지가 성공적으로 전송되었습니다.'}, status=200)
+        except Exception as e:
+            return Response({'message': 'humwarning FCM 메시지 전송 중 오류가 발생했습니다.'}, status=500)
+    return Response({'message' : 'humwarning 경고 메시지가 없습니다.'}, status=200)
     
-def send_push_notification5(registration_token, message):
-    registration_token = ''
+def send_push_notification5(request, soilwarning):
+    user = User.objects.get(username=request.user)
 
-    message = messaging.Message(
-        notification = messaging.Notification(
-            data = '수분 경고!',
-            body = '스마트팜을 확인해주세요!'
-        ),    
+    # fcm_token 가져오기
+    registration_token = user.fcm_token
+
+    if soilwarning != "":
+        print("soilwarning 메세지가 있습니다.")
+        
+        message = messaging.Message(
+        notification=messaging.Notification(
+                title = '건조 경고!',
+                body = '스마트팜을 확인해주세요!'
+            ),
         token = registration_token,
-    )
-
-    response = messaging.send(message)
-    print('successfully soil message: ', response)
+        )
+        
+        try:
+            response = messaging.send(message)
+            # 전송 결과 출력
+            print('Successfully sent message:', response)
+            return Response({'message': 'soilwarning FCM 메시지가 성공적으로 전송되었습니다.'}, status=200)
+        except Exception as e:
+            return Response({'message': 'soilwarning FCM 메시지 전송 중 오류가 발생했습니다.'}, status=500)
+    return Response({'message' : 'soilwarning 경고 메시지가 없습니다.'}, status=200)
     
 # if __name__ == "__main__":
-#     send_push_notification()
+#     user = User.objects.get(username='fcm_token')
+#     user.fcm_token = registration_token
+#     registration_token = registration_token
+    
+#     send_push_notification(registration_token, message)
+#     send_push_notification2(registration_token, message)
+#     send_push_notification3(registration_token, message)
+#     send_push_notification4(registration_token, message)
+#     send_push_notification5(registration_token, message)
