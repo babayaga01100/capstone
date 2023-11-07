@@ -1,9 +1,9 @@
 import numpy
 import cv2
 import matplotlib
-from generate_option import GenerateOption
-from test_model import TestModel
-from load_image import LoadImage
+from .generate_option import GenerateOption
+from .test_model import TestModel
+from .load_image import LoadImage
 
 class GenerateModel:
     def __init__(self, model_path):
@@ -42,7 +42,7 @@ def nir_to_ndvi(rgb_img, nir_img):
     
 
 if __name__ == '__main__':
-    model_path = ""   # model path
+    model_path = "cap/crops/200_net_G_A.pth"   # model path
     rgb_img_path = ""   # RGB image path
 
     croped_rgb_img_path = ""   # path to save preprocessed RGB image

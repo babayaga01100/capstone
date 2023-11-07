@@ -1,15 +1,16 @@
 from django.db import models
 from accounts.models import User
 from crops.models import SmartFarmCrop
+from django.utils import timezone
 
 class SmartFarm(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     sfid = models.CharField(max_length=10)
     crop = models.ForeignKey(SmartFarmCrop, on_delete=models.CASCADE, null=True)
 
 # Create your models here.
 class SmartFarmSensor(models.Model):
-    smartfarm = models.ForeignKey(SmartFarm, on_delete=models.CASCADE)
+    smartfarm = models.ForeignKey(SmartFarm, on_delete=models.PROTECT)
     # sfid = models.ForeignKey(SmartFarm, on_delete=models.CASCADE, db_column="sfid")
     remotepower = models.BooleanField(null=True)
     temperature = models.FloatField(null=True)
@@ -58,3 +59,5 @@ class SmartFarmSensor(models.Model):
     tempwarning = models.TextField(auto_created=True, null=True)
     humwarning = models.TextField(auto_created=True, null=True)
     soilwarning = models.TextField(auto_created=True, null=True)
+
+    timestamp = models.DateTimeField(auto_now=True)

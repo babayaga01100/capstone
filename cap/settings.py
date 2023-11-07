@@ -18,7 +18,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-cred_path = os.path.join(BASE_DIR, "smartfarmKey.json")
+cred_path = os.path.join(BASE_DIR, "smartfarm.json")
 cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 
@@ -95,7 +95,7 @@ DATABASES = {
     }
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'crops')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'crops/uploads')
 MEDIA_URL = '/media/'
 
 
@@ -123,11 +123,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_TZ = True
+# USE_TZ = True
+
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

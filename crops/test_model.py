@@ -1,8 +1,9 @@
 import os
+from crops import networks
 import torch
 from collections import OrderedDict
 from abc import ABC
-import networks
+from crops.networks import *
 
 class TestModel(ABC):
     def __init__(self, opt):
