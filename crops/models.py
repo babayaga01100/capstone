@@ -4,7 +4,7 @@ from django.db import models
 class SmartFarmCrop(models.Model):
     name = models.CharField(max_length=20, null=True)
     day = models.IntegerField(null=True)
-    ndvi = models.FloatField(null=True)
+    ndvi = models.FloatField(null=True) # default=-0
     timestamp = models.DateTimeField(null=True)
     
 class UploadImage(models.Model):

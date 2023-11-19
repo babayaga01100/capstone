@@ -317,10 +317,11 @@ def image_ndvi(request):
     # calculate NDVI
     ndvi_value, ndvi_img = nir_to_ndvi(croped_rgb_img_path, nir_img_path)
     
-    ndvi = SmartFarm.objects.filter(user=user).update(ndvi=ndvi_value, timestamp=timestamp)
-    # ndvi.save()
+    # ndvi = SmartFarm.objects.filter(user=user).update(ndvi=ndvi_value, timestamp=timestamp)
+    ndvi = SmartFarm.objects.filter(user=user)
+    ndvi.save()
     
     print('NDVI:', ndvi_value)
     cv2.imwrite(ndvi_img_path, ndvi_img)   # save NDVI image
     
-    return Response({'ndvi_value': ndvi_value}, status=200)
+    return Response({'ndvi_value': ndvi_value if crop else ""}, status=200)

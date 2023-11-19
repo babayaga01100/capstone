@@ -304,7 +304,6 @@ def send_push_notification5(request, soilwarning):
     
 # 스마트팜 고유번호 확인
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def check_smartfarm_id_view(request):
     sfid = request.data['sfid']
     try:
@@ -314,12 +313,14 @@ def check_smartfarm_id_view(request):
         if existing_smartfarm.exists():
             return Response({'message': '등록할 수 있는 스마트팜입니다.'}, status=200)
         
-        existing_smartfarmm = SmartFarm.objects.filter(sfid=sfid)
+        existing_user = User.objects.get(username=request.user)
+        existing_smartfarmm = SmartFarm.objects.filter(user=existing_user, sfid=sfid)
         
         if existing_smartfarmm.exists():
-            return Response({'message': '등록할 수 있는 스마트팜입니다.'}, status=200)
+            return Response({'message': '이미 등록되어 있는 스마트팜입니다.'}, status=200)
         else:
             return Response({'message': '등록할 수 없는 스마트팜입니다.'}, status=400)
+        
     except Exception as e:
         return Response({'message': 'Error'+ str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
@@ -694,15 +695,19 @@ class RaspberryView(APIView):
             
             now_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
             
-            latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
+            try:
+                latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
             # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
             # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            except SmartFarmSensor.DoesNotExist:
+                latest_id = None
             
-            now_fileds = {field: value for field, value in now_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
-            latest_fileds = {field: value for field, value in latest_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
+            if latest_id is not None:
+                now_fileds = {field: value for field, value in now_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
+                latest_fileds = {field: value for field, value in latest_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
             
-            if now_fileds == latest_fileds:   
-                now_id.delete()
+                if now_fileds == latest_fileds:   
+                    now_id.delete()
                 # print("now_fileds_af:", now_id.id)
                 # print('latest_fileds_af: ', latest_id.id)
         
