@@ -32,6 +32,8 @@ SECRET_KEY = 'django-insecure-)m)3s_ax%f@q#0#*r-m_gj5&lh_yzssoupfnba!v%l_y7dlkd7
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['ssgsmartfarm.com', 'www.ssgsmartfarm.com']
+
 
 # Application definition
 
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'accounts',
     'crops',
     'fcm_notification',
+    # 'sslserver',
 ]
 
 MIDDLEWARE = [
@@ -187,3 +190,5 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')

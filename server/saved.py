@@ -304,6 +304,7 @@ def send_push_notification5(request, soilwarning):
     
 # 스마트팜 고유번호 확인
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def check_smartfarm_id_view(request):
     sfid = request.data['sfid']
     try:
@@ -313,13 +314,8 @@ def check_smartfarm_id_view(request):
         if existing_smartfarm.exists():
             return Response({'message': '등록할 수 있는 스마트팜입니다.'}, status=200)
         
-        existing_user = User.objects.get(username=request.user)
-        existing_smartfarmm = SmartFarm.objects.filter(user=existing_user, sfid=sfid)
-        
-        if existing_smartfarmm.exists():
-            return Response({'message': '이미 등록되어 있는 스마트팜입니다.'}, status=200)
         else:
-            return Response({'message': '등록할 수 없는 스마트팜입니다.'}, status=400)
+            return Response({'message': '스마트팜을 등록할 수 없습니다.'}, status=400)
         
     except Exception as e:
         return Response({'message': 'Error'+ str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
@@ -537,7 +533,7 @@ class RaspberryView(APIView):
     
     def post(self, request):
         smartfarm = request.data['smartfarm']
-        remotepower = request.data['remotepower']
+        # remotepower = request.data['remotepower']
         temperature = request.data['temperature']
         humidity = request.data['humidity']
         light = request.data['light']
@@ -613,19 +609,65 @@ class RaspberryView(APIView):
                 #     smartfarm = SmartFarm.objects.filter(user=user, sfid=smartfarm).latest('id')
                 except SmartFarm.DoesNotExist:
                     smartfarm =SmartFarm.objects.create(user=user, sfid=smartfarm)
+                    smartfarmsensor = SmartFarmSensor.objects.create(
+                        smartfarm=smartfarm, 
+                        remotepower = False,
+                        temperature = temperature,
+                        humidity = humidity,
+                        light = light,
+                        soil = soil,
+                        ledpower = ledpower,
+                        ledstate = ledstate,
+                        ledtoggle = ledtoggle,
+                        ledautotoggle = ledautotoggle,
+                        ledstarttimevalue = ledstarttimevalue,
+                        ledstartminutevalue = ledstartminutevalue,
+                        ledendtimevalue = ledendtimevalue,
+                        ledendminutevalue = ledendminutevalue,
+                        waterpumppower = waterpumppower,
+                        waterpumpstate = waterpumpstate,
+                        waterpumptoggle = waterpumptoggle,
+                        waterpumpautotoggle = waterpumpautotoggle,
+                        waterpumpstarttime = waterpumpstarttime,
+                        waterpumprunningtime = waterpumprunningtime,
+                        waterlevelvoltage = waterlevelvoltage,
+                        watertemperature = watertemperature,
+                        fanpower = fanpower,
+                        fanstate = fanstate,
+                        fantoggle = fantoggle,
+                        fanautotoggle = fanautotoggle,
+                        fanstarttimevalue = fanstarttimevalue,
+                        fanstartminutevalue = fanstartminutevalue,
+                        fanendtimevalue = fanendtimevalue,
+                        fanendminutevalue = fanendminutevalue,
+                        doorpower = doorpower,
+                        doorstate = doorstate,
+                        doortoggle = doortoggle,
+                        doorautotoggle = doorautotoggle,
+                        doorstarttimevalue = doorstarttimevalue,
+                        doorstartminutevalue = doorstartminutevalue,
+                        doorendtimevalue = doorendtimevalue,
+                        doorendminutevalue = doorendminutevalue,
+                        waterlevelwarning = waterlevelwarning,
+                        watertempwarning = watertempwarning,
+                        tempwarning = tempwarning,
+                        humwarning = humwarning,
+                    )
+                    return Response({'remotepower': smartfarmsensor.remotepower})
+
             # except SmartFarm.MultipleObjectsReturned:
             #     # 중복된 데이터가 있다면 가장 최근 데이터를 가져옵니다.
             #     smartfarm = SmartFarm.objects.filter(user=user, sfid=smartfarm).latest('id')
             # user_smartfarm = SmartFarm.objects.filter(user=request.user, sfid=smartfarm)
             # if not user_smartfarm.exists():
             #     Response({'message': '스마트팜이 없거나 권한이 없습니다.'}, status=404)
-            try:
-                latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
-                latest_sensor = SmartFarmSensor.objects.latest('id')
-                remotepower = latest_sensor.remotepower
-            except SmartFarmSensor.DoesNotExist:
-                latest_sensor = SmartFarmSensor.objects.create(smartfarm=smartfarm)
-                remotepower = False
+            # try:
+                # latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+                # latest_sensor = SmartFarmSensor.objects.latest('id')
+                # remotepower = latest_sensor.remotepower
+            # except SmartFarmSensor.DoesNotExist:
+                # latest_sensor = SmartFarmSensor()
+                # remotepower = remotepower
                 
         # except SmartFarm.DoesNotExist:
         #     return Response({'message': '스마트팜이 없거나 권한이 없습니다.'}, status=404)
@@ -644,70 +686,108 @@ class RaspberryView(APIView):
             #         watertemperature = watertemperature,
             #     # ).save()
             #     )
+            
+            latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            if  latest_sensor.remotepower==False:
+                SmartFarmSensor(
+                    smartfarm = smartfarm,
+                    remotepower = False,
+                    temperature = temperature,
+                    humidity = humidity,
+                    light = light,
+                    soil = soil,
+                    ledpower = ledpower,
+                    ledstate = ledstate,
+                    ledtoggle = ledtoggle,
+                    ledautotoggle = ledautotoggle,
+                    ledstarttimevalue = ledstarttimevalue,
+                    ledstartminutevalue = ledstartminutevalue,
+                    ledendtimevalue = ledendtimevalue,
+                    ledendminutevalue = ledendminutevalue,
+                    waterpumppower = waterpumppower,
+                    waterpumpstate = waterpumpstate,
+                    waterpumptoggle = waterpumptoggle,
+                    waterpumpautotoggle = waterpumpautotoggle,
+                    waterpumpstarttime = waterpumpstarttime,
+                    waterpumprunningtime = waterpumprunningtime,
+                    waterlevelvoltage = waterlevelvoltage,
+                    watertemperature = watertemperature,
+                    fanpower = fanpower,
+                    fanstate = fanstate,
+                    fantoggle = fantoggle,
+                    fanautotoggle = fanautotoggle,
+                    fanstarttimevalue = fanstarttimevalue,
+                    fanstartminutevalue = fanstartminutevalue,
+                    fanendtimevalue = fanendtimevalue,
+                    fanendminutevalue = fanendminutevalue,
+                    doorpower = doorpower,
+                    doorstate = doorstate,
+                    doortoggle = doortoggle,
+                    doorautotoggle = doorautotoggle,
+                    doorstarttimevalue = doorstarttimevalue,
+                    doorstartminutevalue = doorstartminutevalue,
+                    doorendtimevalue = doorendtimevalue,
+                    doorendminutevalue = doorendminutevalue,
+                    waterlevelwarning = waterlevelwarning,
+                    watertempwarning = watertempwarning,
+                    tempwarning = tempwarning,
+                    humwarning = humwarning,
+                    soilwarning = soilwarning,
+                ).save()
+            
+            else:
+                # latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+                # latest_sensor = SmartFarmSensor.objects.latest('id')
+                if SmartFarmSensor.DoesNotExist:
+                    latest_sensor = SmartFarmSensor()
+                    # remotepower = remotepower
+                    
+                # newlatest_sensor = copy.copy(latest_sensor)
                 
-            # if remotepower == False:
+                # now_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+                # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
+                
+                # newlatest_sensor.update(id=None, smartfarm=smartfarm, remotepower = True,
+                #                     temperature=temperature, humidity=humidity, light=light, soil=soil)
+                
+                # newlatest_sensor = copy.copy(latest_id)
+                # copy.copy(latest_sensor)
+                SmartFarmSensor.objects.filter(smartfarm=smartfarm).update(
+                    smartfarm = smartfarm,
+                    remotepower = True,
+                    temperature = temperature,
+                    humidity = humidity,
+                    light = light,
+                    soil = soil,
+                    waterlevelvoltage = waterlevelvoltage,
+                    watertemperature = watertemperature,
+                )
+                # newlatest_sensor.id = None
+                # newlatest_sensor.smartfarm = smartfarm
+                # newlatest_sensor.remotepower = True
+                # # newlatest_sensor.remotepower = remotepower
+                # newlatest_sensor.temperature = temperature
+                # newlatest_sensor.humidity = humidity
+                # newlatest_sensor.light = light
+                # newlatest_sensor.soil = soil
 
-            SmartFarmSensor(
-                smartfarm = smartfarm,
-                remotepower = remotepower,
-                temperature = temperature,
-                humidity = humidity,
-                light = light,
-                soil = soil,
-                ledpower = ledpower,
-                ledstate = ledstate,
-                ledtoggle = ledtoggle,
-                ledautotoggle = ledautotoggle,
-                ledstarttimevalue = ledstarttimevalue,
-                ledstartminutevalue = ledstartminutevalue,
-                ledendtimevalue = ledendtimevalue,
-                ledendminutevalue = ledendminutevalue,
-                waterpumppower = waterpumppower,
-                waterpumpstate = waterpumpstate,
-                waterpumptoggle = waterpumptoggle,
-                waterpumpautotoggle = waterpumpautotoggle,
-                waterpumpstarttime = waterpumpstarttime,
-                waterpumprunningtime = waterpumprunningtime,
-                waterlevelvoltage = waterlevelvoltage,
-                watertemperature = watertemperature,
-                fanpower = fanpower,
-                fanstate = fanstate,
-                fantoggle = fantoggle,
-                fanautotoggle = fanautotoggle,
-                fanstarttimevalue = fanstarttimevalue,
-                fanstartminutevalue = fanstartminutevalue,
-                fanendtimevalue = fanendtimevalue,
-                fanendminutevalue = fanendminutevalue,
-                doorpower = doorpower,
-                doorstate = doorstate,
-                doortoggle = doortoggle,
-                doorautotoggle = doorautotoggle,
-                doorstarttimevalue = doorstarttimevalue,
-                doorstartminutevalue = doorstartminutevalue,
-                doorendtimevalue = doorendtimevalue,
-                doorendminutevalue = doorendminutevalue,
-                waterlevelwarning = waterlevelwarning,
-                watertempwarning = watertempwarning,
-                tempwarning = tempwarning,
-                humwarning = humwarning,
-                soilwarning = soilwarning,
-            ).save()
+                # newlatest_sensor.save()
+                
+            # now_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
             
-            now_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            # try:
+            #     latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
+            # # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
+            # # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            # except SmartFarmSensor.DoesNotExist:
+            #     latest_id = None
             
-            try:
-                latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
-            # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
-            # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
-            except SmartFarmSensor.DoesNotExist:
-                latest_id = None
+            # if latest_id is not None:
+            #     now_fileds = {field: value for field, value in now_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
+            #     latest_fileds = {field: value for field, value in latest_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
             
-            if latest_id is not None:
-                now_fileds = {field: value for field, value in now_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
-                latest_fileds = {field: value for field, value in latest_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
-            
-                if now_fileds == latest_fileds:   
-                    now_id.delete()
+            #     if now_fileds == latest_fileds:   
+            #         now_id.delete()
                 # print("now_fileds_af:", now_id.id)
                 # print('latest_fileds_af: ', latest_id.id)
         
@@ -784,7 +864,6 @@ class InfoView(generics.ListAPIView):
             userin = self.request.user                
             smartfarm = SmartFarm.objects.filter(user=userin).latest('sfid')
             sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
-
             return SmartFarmSensor.objects.filter(id=sensor.id)
 
         except not SmartFarmSensor.objects.filter(user=userin).exists():
@@ -833,7 +912,7 @@ class LedView(generics.ListAPIView):
                         # ledautotoggle=ledautotoggle, ledstarttimevalue=ledstarttimevalue, 
                         # ledstartminutevalue=ledstartminutevalue, ledendtimevalue=ledendtimevalue, 
                         # ledendminutevalue=ledendminutevalue).save()
-            print(request.data)
+            
             return Response({"message": "LED 제어 성공"}, status=200)
         except SmartFarmSensor.DoesNotExist:
             return Response({'message': '등록한 스마트팜이 없습니다.'}, status=404)
@@ -880,7 +959,7 @@ class WaterView(generics.ListAPIView):
             sensor.waterpumpstarttime = waterpumpstarttime
             sensor.waterpumprunningtime = waterpumprunningtime
             sensor.save()
-            print(request.data)
+            
             # SmartFarmSensor(smartfarm=smartfarm, waterpumptoggle=waterpumptoggle, 
             #     waterpumpautotoggle=waterpumpautotoggle, waterpumpstarttime=waterpumpstarttime, 
             #     waterpumprunningtime=waterpumprunningtime).save()
@@ -937,7 +1016,7 @@ class FanView(generics.ListAPIView):
             sensor.fanendtimevalue = fanendtimevalue
             sensor.fanendminutevalue = fanendminutevalue
             sensor.save()
-            print(request.data)
+            
             # SmartFarmSensor(smartfarm=smartfarm, fantoggle=fantoggle, fanautotoggle=fanautotoggle, 
             #     fanstarttimevalue=fanstarttimevalue, fanstartminutevalue=fanstartminutevalue, 
             #     fanendtimevalue=fanendtimevalue, fanendminutevalue=fanendminutevalue).save()
@@ -991,7 +1070,7 @@ class DoorView(generics.ListAPIView):
             sensor.doorendtimevalue = doorendtimevalue
             sensor.doorendminutevalue = doorendminutevalue
             sensor.save()
-            print(request.data)
+            
             # SmartFarmSensor(smartfarm=smartfarm, doortoggle=doortoggle, doorautotoggle=doorautotoggle, 
             #             doorstarttimevalue=doorstarttimevalue, doorstartminutevalue=doorstartminutevalue, 
             #             doorendtimevalue=doorendtimevalue, doorendminutevalue=doorendminutevalue).save()

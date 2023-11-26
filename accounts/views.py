@@ -112,7 +112,7 @@ def check_view(request):
         sensor_data['crop_check'] = False
         sensor_data['crop_name'] = ''
         sensor_data['crop_day'] = ''
-        sensor_data['ndvi'] = ndvi.ndvi if crop else ""
+        sensor_data['ndvi'] = ''
         
         return Response(sensor_data, status=200)
     
@@ -124,7 +124,7 @@ def check_view(request):
             'crop_check': False,
             'crop_name': '',
             'crop_day': '',
-            'ndvi': ndvi.ndvi if crop else ""
+            'ndvi': ''
         }
         
         return Response(sensor_data, status=200)
