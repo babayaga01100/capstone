@@ -823,7 +823,224 @@ class RaspberryView(APIView):
         # print(remote.first().remotepower, len(remote))
         # return Response({'remotepower': remote.first().remotepower})
 
-          
+     
+# Create your views here.
+class RaspberryView(APIView):
+# class RaspberryView(generics.ListAPIView):
+    # queryset = SmartFarmSensor.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = SmartFarmSensorBaseModelSerializer
+    
+    def post(self, request):
+        smartfarm = request.data['smartfarm']
+        remotepower = request.data['remotepower']
+        temperature = request.data['temperature']
+        humidity = request.data['humidity']
+        light = request.data['light']
+        soil = request.data['soil']
+        
+        ledpower = request.data['ledpower']
+        ledstate = request.data['ledstate']
+        ledtoggle = request.data['ledtoggle']
+        ledautotoggle = request.data['ledautotoggle']
+        ledstarttimevalue = request.data['ledstarttimevalue']
+        ledstartminutevalue = request.data['ledstartminutevalue']
+        ledendtimevalue = request.data['ledendtimevalue']
+        ledendminutevalue = request.data['ledendminutevalue']
+    
+        waterpumppower = request.data['waterpumppower']
+        waterpumpstate = request.data['waterpumpstate']
+        waterpumptoggle = request.data['waterpumptoggle']
+        waterpumpautotoggle = request.data['waterpumpautotoggle']
+        waterpumpstarttime = request.data['waterpumpstarttime']
+        waterpumprunningtime = request.data['waterpumprunningtime']
+        waterlevelvoltage = request.data['waterlevelvoltage']
+        watertemperature = request.data['watertemperature']
+    
+        fanpower = request.data['fanpower']
+        fanstate = request.data['fanstate']
+        fantoggle = request.data['fantoggle']
+        fanautotoggle = request.data['fanautotoggle']
+        fanstarttimevalue = request.data['fanstarttimevalue']
+        fanstartminutevalue = request.data['fanstartminutevalue']
+        fanendtimevalue = request.data['fanendtimevalue']
+        fanendminutevalue = request.data['fanendminutevalue']
+
+        doorpower = request.data['doorpower']
+        doorstate = request.data['doorstate']
+        doortoggle = request.data['doortoggle']
+        doorautotoggle = request.data['doorautotoggle']
+        doorstarttimevalue = request.data['doorstarttimevalue']
+        doorstartminutevalue = request.data['doorstartminutevalue']
+        doorendtimevalue = request.data['doorendtimevalue']
+        doorendminutevalue = request.data['doorendminutevalue']
+    
+        waterlevelwarning = request.data['waterlevelwarning']
+        watertempwarning = request.data['watertempwarning']
+        tempwarning = request.data['tempwarning']
+        humwarning = request.data['humwarning']
+        soilwarning = request.data['soilwarning']
+        
+        try:
+            
+            try:
+                smartfarm = SmartFarm.objects.get(sfid=request.data['smartfarm'])
+                
+            except SmartFarm.DoesNotExist:
+                
+                try:
+                    # name = request.data.get('user')
+                    user = User.objects.get(name= None)
+                except User.DoesNotExist:
+                    user = User.objects.create(name=None)
+            
+            # try:
+            #     user = User.objects.get(user=request.data['user'])
+            # except User.DoesNotExist:
+            #     user = None
+                
+                try:
+                    smartfarm = SmartFarm.objects.get(user=user,sfid=smartfarm)
+                
+                # try:
+                #     smartfarm = SmartFarm.objects.get(user__isnull=False, sfid=smartfarm.sfid)
+                # except SmartFarm.MultipleObjectsReturned:
+                #     # 중복된 데이터가 있다면 가장 최근 데이터를 가져옵니다.
+                #     smartfarm = SmartFarm.objects.filter(user=user, sfid=smartfarm).latest('id')
+                except SmartFarm.DoesNotExist:
+                    smartfarm =SmartFarm.objects.create(user=user, sfid=smartfarm)
+            # except SmartFarm.MultipleObjectsReturned:
+            #     # 중복된 데이터가 있다면 가장 최근 데이터를 가져옵니다.
+            #     smartfarm = SmartFarm.objects.filter(user=user, sfid=smartfarm).latest('id')
+            # user_smartfarm = SmartFarm.objects.filter(user=request.user, sfid=smartfarm)
+            # if not user_smartfarm.exists():
+            #     Response({'message': '스마트팜이 없거나 권한이 없습니다.'}, status=404)
+            try:
+                latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+                latest_sensor = SmartFarmSensor.objects.latest('id')
+                remotepower = latest_sensor.remotepower
+            except SmartFarmSensor.DoesNotExist:
+                latest_sensor = SmartFarmSensor.objects.create(smartfarm=smartfarm)
+                remotepower = False
+                
+        # except SmartFarm.DoesNotExist:
+        #     return Response({'message': '스마트팜이 없거나 권한이 없습니다.'}, status=404)
+        # except SmartFarmSensor.DoesNotExist:
+        #     return Response({'message': '등록한 스마트팜이 없습니다.'}, status=404)
+            # else:
+            # for smartfarm in user_smartfarm:
+            #     print("여기 들어옴?", remotepower)
+            # if remotepower == True:
+            #     SmartFarmSensor.objects.filter(smartfarm=smartfarm).update(
+            #         smartfarm = smartfarm,
+            #         remotepower = remotepower,
+            #         temperature = temperature,
+            #         humidity = humidity,
+            #         waterlevelvoltage = waterlevelvoltage,
+            #         watertemperature = watertemperature,
+            #     # ).save()
+            #     )
+                
+            # if remotepower == False:
+
+            SmartFarmSensor(
+                smartfarm = smartfarm,
+                remotepower = remotepower,
+                temperature = temperature,
+                humidity = humidity,
+                light = light,
+                soil = soil,
+                ledpower = ledpower,
+                ledstate = ledstate,
+                ledtoggle = ledtoggle,
+                ledautotoggle = ledautotoggle,
+                ledstarttimevalue = ledstarttimevalue,
+                ledstartminutevalue = ledstartminutevalue,
+                ledendtimevalue = ledendtimevalue,
+                ledendminutevalue = ledendminutevalue,
+                waterpumppower = waterpumppower,
+                waterpumpstate = waterpumpstate,
+                waterpumptoggle = waterpumptoggle,
+                waterpumpautotoggle = waterpumpautotoggle,
+                waterpumpstarttime = waterpumpstarttime,
+                waterpumprunningtime = waterpumprunningtime,
+                waterlevelvoltage = waterlevelvoltage,
+                watertemperature = watertemperature,
+                fanpower = fanpower,
+                fanstate = fanstate,
+                fantoggle = fantoggle,
+                fanautotoggle = fanautotoggle,
+                fanstarttimevalue = fanstarttimevalue,
+                fanstartminutevalue = fanstartminutevalue,
+                fanendtimevalue = fanendtimevalue,
+                fanendminutevalue = fanendminutevalue,
+                doorpower = doorpower,
+                doorstate = doorstate,
+                doortoggle = doortoggle,
+                doorautotoggle = doorautotoggle,
+                doorstarttimevalue = doorstarttimevalue,
+                doorstartminutevalue = doorstartminutevalue,
+                doorendtimevalue = doorendtimevalue,
+                doorendminutevalue = doorendminutevalue,
+                waterlevelwarning = waterlevelwarning,
+                watertempwarning = watertempwarning,
+                tempwarning = tempwarning,
+                humwarning = humwarning,
+                soilwarning = soilwarning,
+            ).save()
+            
+            now_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            
+            try:
+                latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
+            # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm, id__lte=now_id.id-1).latest('id')
+            # latest_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            except SmartFarmSensor.DoesNotExist:
+                latest_id = None
+            
+            if latest_id is not None:
+                now_fileds = {field: value for field, value in now_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
+                latest_fileds = {field: value for field, value in latest_id.__dict__.items() if field != 'id' and field != '_state' and field != 'timestamp'}
+            
+                if now_fileds == latest_fileds:   
+                    now_id.delete()
+                # print("now_fileds_af:", now_id.id)
+                # print('latest_fileds_af: ', latest_id.id)
+        
+            waterlevelwarning = request.data.get("waterlevelwarning", "")
+            send_push_notification(request, waterlevelwarning)
+        
+            watertempwarning = request.data.get("watertempwarning", "")
+            send_push_notification2(request, watertempwarning)
+
+            tempwarning = request.data.get("tempwarning", "")
+            send_push_notification3(request, tempwarning)
+
+            humwarning = request.data.get("humwarning", "")
+            send_push_notification4(request, humwarning)
+
+            soilwarning = request.data.get("soilwarning", "")
+            send_push_notification5(request, soilwarning)
+            
+            latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            latest_sensor = SmartFarmSensor.objects.latest('id')
+            remotepower = latest_sensor.remotepower
+                
+        # except SmartFarm.DoesNotExist:
+        #     return Response({'message': '스마트팜이 없거나 권한이 없습니다.'}, status=404)
+        
+        except Exception as e:
+            return Response({'message': 'Error'+ str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+        
+        return Response({'remotepower': remotepower})
+        # return Response({'su':'ccess_rsp'})
+        # latest_id = SmartFarmSensor.objects.latest('id').id
+        # remote = SmartFarmSensor.objects.filter(id=latest_id)
+        # print(remote.first().remotepower, len(remote))
+        # return Response({'remotepower': remote.first().remotepower})
+
+        
+        
 class InfoView(generics.ListAPIView):
 # class InfoView(APIView):
     # queryset = SmartFarmSensor.objects.all()
