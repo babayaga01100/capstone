@@ -34,6 +34,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = ['ssgsmartfarm.com', 'www.ssgsmartfarm.com']
 
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# SECURE_SSL_REDIRECT = True
 
 # Application definition
 

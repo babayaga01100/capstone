@@ -304,6 +304,7 @@ def send_push_notification5(request, soilwarning):
     
 # 스마트팜 고유번호 확인
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def check_smartfarm_id_view(request):
     sfid = request.data['sfid']
     try:
@@ -312,6 +313,8 @@ def check_smartfarm_id_view(request):
         
         if existing_smartfarm.exists():
             return Response({'message': '등록할 수 있는 스마트팜입니다.'}, status=200)
+        if not existing_smartfarm.exists():
+            return Response({'message': '등록할 수 없는 스마트팜입니다.'}, status=400)
         
         existing_user = User.objects.get(username=request.user)
         existing_smartfarmm = SmartFarm.objects.filter(user=existing_user, sfid=sfid)
@@ -527,7 +530,8 @@ def get_smartfarm_sensor(request, smartfarm_id):
 
     except Exception as e:
             return Response({'message': 'Error' + str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-   # Create your views here.
+        
+# Create your views here.
 class RaspberryView(APIView):
 # class RaspberryView(generics.ListAPIView):
     # queryset = SmartFarmSensor.objects.all()
@@ -689,8 +693,11 @@ class RaspberryView(APIView):
             #         watertemperature = watertemperature,
             #     # ).save()
             #     )
-            
+            smartfarm = SmartFarm.objects.filter(sfid=request.data['smartfarm']).latest('id')
             latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+            # latest_sensor = SmartFarmSensor.objects.latest('id')
+            # last_remotepower = latest_sensor.remotepower
+            
             if  latest_sensor.remotepower==False:
                 SmartFarmSensor(
                     smartfarm = smartfarm,
@@ -741,8 +748,55 @@ class RaspberryView(APIView):
             else:
                 # latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
                 # latest_sensor = SmartFarmSensor.objects.latest('id')
-                if SmartFarmSensor.DoesNotExist:
-                    latest_sensor = SmartFarmSensor()
+                # if SmartFarmSensor.DoesNotExist:
+                #     SmartFarmSensor(
+                #     smartfarm = smartfarm,
+                #     remotepower = False,
+                #     temperature = temperature,
+                #     humidity = humidity,
+                #     light = light,
+                #     soil = soil,
+                #     ledpower = ledpower,
+                #     ledstate = ledstate,
+                #     ledtoggle = ledtoggle,
+                #     ledautotoggle = ledautotoggle,
+                #     ledstarttimevalue = ledstarttimevalue,
+                #     ledstartminutevalue = ledstartminutevalue,
+                #     ledendtimevalue = ledendtimevalue,
+                #     ledendminutevalue = ledendminutevalue,
+                #     waterpumppower = waterpumppower,
+                #     waterpumpstate = waterpumpstate,
+                #     waterpumptoggle = waterpumptoggle,
+                #     waterpumpautotoggle = waterpumpautotoggle,
+                #     waterpumpstarttime = waterpumpstarttime,
+                #     waterpumprunningtime = waterpumprunningtime,
+                #     waterlevelvoltage = waterlevelvoltage,
+                #     watertemperature = watertemperature,
+                #     fanpower = fanpower,
+                #     fanstate = fanstate,
+                #     fantoggle = fantoggle,
+                #     fanautotoggle = fanautotoggle,
+                #     fanstarttimevalue = fanstarttimevalue,
+                #     fanstartminutevalue = fanstartminutevalue,
+                #     fanendtimevalue = fanendtimevalue,
+                #     fanendminutevalue = fanendminutevalue,
+                #     doorpower = doorpower,
+                #     doorstate = doorstate,
+                #     doortoggle = doortoggle,
+                #     doorautotoggle = doorautotoggle,
+                #     doorstarttimevalue = doorstarttimevalue,
+                #     doorstartminutevalue = doorstartminutevalue,
+                #     doorendtimevalue = doorendtimevalue,
+                #     doorendminutevalue = doorendminutevalue,
+                #     waterlevelwarning = waterlevelwarning,
+                #     watertempwarning = watertempwarning,
+                #     tempwarning = tempwarning,
+                #     humwarning = humwarning,
+                #     soilwarning = soilwarning,
+                # ).save()
+                    # smartfarm = SmartFarm.objects.filter(sfid=request.data['smartfarm']).latest('id')
+                    # latest_sensor = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
+                    # latest_sensor = SmartFarmSensor()
                     # remotepower = remotepower
                     
                 # newlatest_sensor = copy.copy(latest_sensor)
@@ -753,28 +807,30 @@ class RaspberryView(APIView):
                 # newlatest_sensor.update(id=None, smartfarm=smartfarm, remotepower = True,
                 #                     temperature=temperature, humidity=humidity, light=light, soil=soil)
                 
-                # newlatest_sensor = copy.copy(latest_id)
+                newlatest_sensor = copy.copy(latest_sensor)
                 # copy.copy(latest_sensor)
-                SmartFarmSensor.objects.filter(smartfarm=smartfarm).update(
-                    smartfarm = smartfarm,
-                    remotepower = True,
-                    temperature = temperature,
-                    humidity = humidity,
-                    light = light,
-                    soil = soil,
-                    waterlevelvoltage = waterlevelvoltage,
-                    watertemperature = watertemperature,
-                )
-                # newlatest_sensor.id = None
-                # newlatest_sensor.smartfarm = smartfarm
-                # newlatest_sensor.remotepower = True
-                # # newlatest_sensor.remotepower = remotepower
-                # newlatest_sensor.temperature = temperature
-                # newlatest_sensor.humidity = humidity
-                # newlatest_sensor.light = light
-                # newlatest_sensor.soil = soil
+                # SmartFarmSensor.objects.filter(smartfarm=smartfarm).update(
+                #     smartfarm = smartfarm,
+                #     remotepower = True,
+                #     temperature = temperature,
+                #     humidity = humidity,
+                #     light = light,
+                #     soil = soil,
+                #     waterlevelvoltage = waterlevelvoltage,
+                #     watertemperature = watertemperature,
+                # )
+                newlatest_sensor.id = None
+                newlatest_sensor.smartfarm = smartfarm
+                newlatest_sensor.remotepower = True
+                # newlatest_sensor.remotepower = remotepower
+                newlatest_sensor.temperature = temperature
+                newlatest_sensor.humidity = humidity
+                newlatest_sensor.light = light
+                newlatest_sensor.soil = soil
+                newlatest_sensor.waterlevelvoltage = waterlevelvoltage
+                newlatest_sensor.watertemperature = watertemperature
 
-                # newlatest_sensor.save()
+                newlatest_sensor.save()
                 
             # now_id = SmartFarmSensor.objects.filter(smartfarm=smartfarm).latest('id')
             
@@ -1157,27 +1213,31 @@ def get_warning(request):
                 Q(waterlevelwarning=None) & Q(watertempwarning=None) & Q(tempwarning=None) & Q(humwarning=None) & Q(soilwarning=None)).values(
                     'waterlevelwarning', 'watertempwarning', 'tempwarning', 'humwarning', 'soilwarning', 'timestamp'
                 )
+        # queryset = SmartFarmSensor.objects.filter(smartfarm=smartfarm, timestamp__gte=date,).exclude(
+        #     Q(waterlevelwarning=None) & Q(watertempwarning=None) & Q(tempwarning=None) & Q(humwarning=None) & Q(soilwarning=None)
+        #     ).order_by('-timestamp').values('waterlevelwarning', 'watertempwarning', 'tempwarning', 'humwarning',
+        #         'soilwarning', 'timestamp')
+
 
         for idx, item in enumerate(queryset):
-            print("date:", date)
-            print("smartfarm:", smartfarm)
-            print("queryset:", queryset)
+            item = {k: '' if v is None else v for k, v in item.items()}
+            
             warning = {
                 'id' : idx + 1,
                 'body' : ', '.join([v for k, v in item.items() if k != 'timestamp' and v != '']),
                 'time' : item['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
             }
-
+    
             if warning['body']:
                 warning_result.append(warning)
-
-        print("dd", warning_result)
+                
+        return Response(warning_result)
+    
         # for i in range(len(queryset)):
         #     warning_list = {k : v for k, v in queryset[i].items() if v != ""}
         #     if warning_list:
         #         warning_result.append(warning_list)
     
-        return Response(warning_result)
     except SmartFarm.DoesNotExist:
         return Response({'message': '등록된 스마트팜이 없습니다.'}, status=404)
 

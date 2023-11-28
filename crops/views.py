@@ -55,9 +55,11 @@ def register_crop_view(request):
         return Response({'message': '스마트팜에 이미 작물이 등록되어 있습니다.'}, status=400)
     
     # 작물 등록하기
+    # user = request.user
     name = request.data['name']
     day = request.data['day']
     crop = SmartFarmCrop.objects.create(name=name, day=day)
+    # crop = SmartFarmCrop.objects.create(user=user, name=name, day=day)
     crop.save()
     
     # 스마트팜에 작물 등록하기
@@ -184,7 +186,9 @@ class UploadView(APIView):
                 # uploaded_file = UploadImage(file=request.FILES['files'])
                 form.save()  # 이미지를 데이터베이스에 저장
                 Response({'message': '이미지가 성공적으로 업로드되었습니다.'}, status=200)
-            upload = request.FILES.get('file')
+            
+            upload = request.FILES.get('image')
+
             if upload:
                 with open(os.path.join(settings.MEDIA_ROOT, upload.name), 'wb+') as destination:
                 # with open(f'/uploads/{upload}', 'wb+') as destination:
@@ -192,7 +196,7 @@ class UploadView(APIView):
                         destination.write(chunk)
                 
                 Response({'message': '이미지가 성공적으로 업로드되었습니다.'}, status=200)
-        
+
             # 스마트팜 가져오기
             try:
                 smartfarm = SmartFarm.objects.get(sfid=smartfarm)
@@ -201,7 +205,8 @@ class UploadView(APIView):
             
             # 작물 가져오기
             try:
-                crop = SmartFarmCrop.objects.get(user=smartfarm.user)
+                # crop = SmartFarmCrop.objects.get(user=smartfarm.user)
+                crop = SmartFarmCrop.objects.get(smartfarm=smartfarm)
             except SmartFarmCrop.DoesNotExist:
                 return Response({'message': '작물이 등록되어 있지 않습니다.'}, status=404) 
             
