@@ -91,13 +91,17 @@ def check_view(request):
         sensor_data['smartfarm_check'] = smartfarm is not None
         sensor_data['smartfarm'] = smartfarm.sfid if smartfarm else ""
         
-        crop = SmartFarmCrop.objects.get(smartfarm=smartfarm) if smartfarm else None
+        crop = SmartFarmCrop.objects.get(user=user, smartfarm=smartfarm) if smartfarm else None
         sensor_data['crop_check'] = crop is not None
         sensor_data['crop_name'] = crop.name if crop else ""
         sensor_data['crop_day'] = crop.day if crop else ""
         
-        ndvi = SmartFarmCrop.objects.filter(smartfarm=smartfarm).latest('id') if smartfarm else None
-        sensor_data['ndvi'] = ndvi.ndvi if crop else ""
+        ndvi = SmartFarmCrop.objects.filter(user=user, smartfarm=smartfarm).latest('id') if smartfarm else None
+        ndvi = SmartFarmCrop.objects.latest('id')
+        
+        
+        # print(ndvi)
+        sensor_data['ndvi'] = round(ndvi.ndvi, 3) if crop else ""
         
         return Response(sensor_data)
     

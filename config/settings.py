@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-)m)3s_ax%f@q#0#*r-m_gj5&lh_yzssoupfnba!v%l_y7dlkd7
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = ['ssgsmartfarm.com', 'www.ssgsmartfarm.com']
+# ALLOWED_HOSTS = ['192.168.219.106', '127.0.0.1', '192.168.219.106:3000']
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

@@ -1,5 +1,6 @@
 import os
 import time
+import copy
 from urllib import response
 from django.shortcuts import render
 
@@ -55,11 +56,11 @@ def register_crop_view(request):
         return Response({'message': '스마트팜에 이미 작물이 등록되어 있습니다.'}, status=400)
     
     # 작물 등록하기
-    # user = request.user
+    user = request.user
     name = request.data['name']
     day = request.data['day']
-    crop = SmartFarmCrop.objects.create(name=name, day=day)
-    # crop = SmartFarmCrop.objects.create(user=user, name=name, day=day)
+    # crop = SmartFarmCrop.objects.create(name=name, day=day)
+    crop = SmartFarmCrop.objects.create(user=user, name=name, day=day)
     crop.save()
     
     # 스마트팜에 작물 등록하기
@@ -153,11 +154,11 @@ def remove_crop_view(request):
     
     # 작물 삭제하기
     try:
-        crop = SmartFarmCrop.objects.get(smartfarm=smartfarm)
+        crop = SmartFarmCrop.objects.get(user=user, smartfarm=smartfarm)
         # crop.smartfarm = None
         smartfarm.crop = None
-        user = User.objects.get(username=None)
-        smartfarm.user = user
+        # user = User.objects.get(name=None)
+        # smartfarm.user = user
         # crop = None
         smartfarm.save()
         crop.delete()
@@ -187,7 +188,7 @@ class UploadView(APIView):
                 form.save()  # 이미지를 데이터베이스에 저장
                 Response({'message': '이미지가 성공적으로 업로드되었습니다.'}, status=200)
             
-            upload = request.FILES.get('image')
+            upload = request.FILES.get('file')
 
             if upload:
                 with open(os.path.join(settings.MEDIA_ROOT, upload.name), 'wb+') as destination:
@@ -245,17 +246,34 @@ class UploadView(APIView):
             # calculate NDVI
             ndvi_value, ndvi_img = nir_to_ndvi(croped_rgb_img_path, nir_img_path)
             
-            # latest_id = SmartFarmCrop.objects.latest('id').id
-            smartfarm_ndvi = SmartFarmCrop.objects.get(id=crop.id)
-            smartfarm_ndvi.id = None
-            smartfarm_ndvi.ndvi = ndvi_value
-            smartfarm_ndvi.timestamp = timestamp
-            smartfarm_ndvi.save()
+            # latest_id = SmartFarmCrop.objects.filter(smartfarm=smartfarm).latest('id')
             
-            print('NDVI:', ndvi_value)
+            # last = copy.copy(latest_id)
+            
+            # last.id = None
+            # last.ndvi = ndvi_value
+            # last.timestamp = timestamp
+            smartfarm_ndvi = SmartFarmCrop.objects.get(id=crop.id)
+            
+            last = copy.copy(smartfarm_ndvi)
+            
+            last.id = None
+            last.ndvi = ndvi_value
+            last.timestamp = timestamp
+            last.save()
+            
+            # smartfarm_ndvi.id = None
+            # smartfarm_ndvi.ndvi = ndvi_value
+            # smartfarm_ndvi.timestamp = timestamp
+            # smartfarm_ndvi.save()
+            
+            # userin = SmartFarm.objects.filter(sfid=smartfarm)
+            # SmartFarmCrop.objects.filter(user=userin).update(ndvi=ndvi_value, timestamp=timestamp)
+            
+            print('NDVI:', round(ndvi_value, 3))
             cv2.imwrite(ndvi_img_path, ndvi_img)   # save NDVI image
             
-            return Response({'ndvi_value': ndvi_value}, status=200)
+            return Response({'ndvi_value': round(ndvi_value, 3)}, status=200)
 
         else:
             return Response({'error': '잘못된 요청입니다.'}, status=400)
