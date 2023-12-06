@@ -26,7 +26,7 @@ firebase_admin.initialize_app(cred)
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)m)3s_ax%f@q#0#*r-m_gj5&lh_yzssoupfnba!v%l_y7dlkd7'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
